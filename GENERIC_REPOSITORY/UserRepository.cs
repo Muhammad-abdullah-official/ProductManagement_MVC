@@ -1,4 +1,5 @@
-﻿using ProductManagement.AppDbContext_EFCore;
+﻿using Microsoft.EntityFrameworkCore;
+using ProductManagement.AppDbContext_EFCore;
 using ProductManagement.Models;
 
 namespace ProductManagement.GENERIC_REPOSITORY

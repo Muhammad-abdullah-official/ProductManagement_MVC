@@ -1,4 +1,8 @@
-﻿using ProductManagement.AppDbContext_EFCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using ProductManagement.AppDbContext_EFCore;
 using ProductManagement.GENERIC_REPOSITORY;
 using ProductManagement.JWT_TOKEN_SERVICE;
 using ProductManagement.Services;
@@ -14,7 +18,7 @@ namespace ProductManagement.SERVICE
         {
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(config.GetConnectionString("DefaultConnection"),
-                    npgsql => npgsql.MigrationsAssembly("AspNetMonolith")));
+                    npgsql => npgsql.MigrationsAssembly("ProductManagement")));
 
             return services;
         }

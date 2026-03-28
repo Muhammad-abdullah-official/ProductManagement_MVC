@@ -11,8 +11,6 @@ namespace ProductManagement.AppDbContext_EFCore
         public DbSet<User> Users => Set<User>();
         public DbSet<Product> Products => Set<Product>();
 
-        public object ChangeTracker { get; private set; }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -25,7 +23,6 @@ namespace ProductManagement.AppDbContext_EFCore
                 entity.Property(u => u.Email).IsRequired().HasMaxLength(256);
                 entity.Property(u => u.PasswordHash).IsRequired();
                 entity.Property(u => u.FirstName).HasMaxLength(100);
-                entity.Property(u => u.LastName).HasMaxLength(100);
                 entity.Property(u => u.Role).HasDefaultValue("User");
 
                 // Global query filter: automatically exclude soft-deleted rows
@@ -52,7 +49,7 @@ namespace ProductManagement.AppDbContext_EFCore
         // ── Auto-update UpdatedAt before every save ──
         public override Task<int> SaveChangesAsync(CancellationToken ct = default)
         {
-            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+            foreach (var entry in ChangeTracker.Entries<Entity>())
             {
                 if (entry.State == EntityState.Modified)
                     entry.Entity.UpdatedAt = DateTime.UtcNow;

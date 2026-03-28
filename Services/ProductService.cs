@@ -99,7 +99,7 @@ namespace ProductManagement.Services
         // ── Map Entity → DTO ─────────────────────
         private static ProductDto MapToDto(Product p) =>
             new(p.Id, p.Name, p.Description, p.Price, p.Stock,
-                p.UserId, $"{p.User?.FirstName} ".Trim(),
+                p.UserId, $"{p.User?.FirstName} {p.User?.LastName}".Trim(),
                 p.CreatedAt);
     }
 }

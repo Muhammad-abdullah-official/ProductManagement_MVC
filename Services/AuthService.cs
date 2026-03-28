@@ -39,13 +39,14 @@ namespace ProductManagement.Services
                 Email = req.Email.ToLower(),
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password),
                 FirstName = req.FirstName,
+                LastName = req.LastName,
                 Role = "User"
             };
 
             await _userRepo.AddAsync(user);
             _logger.LogInformation("New user registered: {Email}", user.Email);
 
-            return BuildAuthResponse(user, 201);
+            return await BuildAuthResponse(user, 201);
         }
 
         // ── LOGIN ─────────────────────────────────
@@ -58,7 +59,7 @@ namespace ProductManagement.Services
                 return ApiResponse<AuthResponse>.Fail("Invalid email or password.", 401);
 
             _logger.LogInformation("User logged in: {Email}", user.Email);
-            return BuildAuthResponse(user);
+            return await BuildAuthResponse(user);
         }
 
         // ── REFRESH TOKEN ─────────────────────────
@@ -69,7 +70,7 @@ namespace ProductManagement.Services
             if (user is null || user.RefreshTokenExpiry < DateTime.UtcNow)
                 return ApiResponse<AuthResponse>.Unauthorized("Invalid or expired refresh token.");
 
-            return BuildAuthResponse(user);
+            return await BuildAuthResponse(user);
         }
 
         // ── LOGOUT ────────────────────────────────
@@ -87,7 +88,7 @@ namespace ProductManagement.Services
         }
 
         // ── PRIVATE HELPER ────────────────────────
-        private ApiResponse<AuthResponse> BuildAuthResponse(User user, int statusCode = 200)
+        private async Task<ApiResponse<AuthResponse>> BuildAuthResponse(User user, int statusCode = 200)
         {
             var accessToken = _jwt.GenerateAccessToken(user);
             var refreshToken = _jwt.GenerateRefreshToken();
@@ -97,7 +98,7 @@ namespace ProductManagement.Services
             // Persist refresh token to DB (hashed in production — simplified here)
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(refreshDays);
-            _ = _userRepo.UpdateAsync(user);   // fire-and-forget (OK here)
+            await _userRepo.UpdateAsync(user);
 
             var response = new AuthResponse(
                 AccessToken: accessToken,
@@ -112,6 +113,6 @@ namespace ProductManagement.Services
         }
 
         private static UserDto MapToDto(User u) =>
-            new(u.Id, u.Email, u.FirstName,  u.Role, u.CreatedAt);
+            new(u.Id, u.Email, u.FirstName, u.LastName, u.Role, u.CreatedAt);
     }
 }

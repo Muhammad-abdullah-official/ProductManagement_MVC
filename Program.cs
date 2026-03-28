@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.RateLimiting;
 using ProductManagement.AppDbContext_EFCore;
 using ProductManagement.MIDDLEWARE;
 using ProductManagement.SERVICE;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -34,14 +36,14 @@ try
     // ═══════════════════════════════════════════
     //  SERVICE REGISTRATIONS  (DI Container)
     // ═══════════════════════════════════════════
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+
     builder.Services.AddDatabase(builder.Configuration);
     builder.Services.AddJwtAuthentication(builder.Configuration);
     builder.Services.AddRepositories();
     builder.Services.AddAppServices();
     builder.Services.AddSwaggerWithJwt();
-
-    builder.Services.AddControllers();
-    builder.Services.AddEndpointsApiExplorer();
 
     // CORS — allow frontend dev server
     builder.Services.AddCors(options =>
@@ -85,7 +87,7 @@ try
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "AspNet Monolith v1");
-            c.RoutePrefix = string.Empty;   // serve at root URL
+            c.RoutePrefix = "swagger";
         });
     }
 
